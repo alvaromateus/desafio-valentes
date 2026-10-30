@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  SUPER_ADMIN
+}
+
+enum MediaSource {
+  UPLOAD
+  YOUTUBE
+}
+
+model User {
+  id            String        @id @default(cuid())
+  username      String        @unique
+  password      String
+  phone         String
+  role          Role          @default(USER)
+  emoji         String        @default("😀")
+  avatarUrl     String?
+  avatarSeed    String?
+  createdAt     DateTime      @default(now())
+  memberships   GroupMember[]
+  attempts      Attempt[]
+  adminOfGroups Group[]       @relation("GroupAdmin")
+  stat          UserStats?
+  badges        UserBadge[]
+  bans          Ban[]
+}
+
+model Group {
+  id        String        @id @default(cuid())
+  name      String
+  description String?
+  emoji     String        @default("📖")
+  adminId   String
+  admin     User          @relation("GroupAdmin", fields: [adminId], references: [id])
+  createdAt DateTime      @default(now())
+  members   GroupMember[]
+  questions Question[]
+  bans      Ban[]
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  userId   String
+  score    Int      @default(0)
+  joinedAt DateTime @default(now())
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([groupId, score])
+}
+
+model Ban {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  reason    String
+  bannedBy  String
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  groupId     String
+  text        String
+  mediaUrl    String?
+  mediaType   String?
+  mediaSource MediaSource?
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  group       Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  options     Option[]
+  attempts    Attempt[]
+}
+
+model Option {
+  id          String       @id @default(cuid())
+  questionId  String
+  text        String
+  isCorrect   Boolean      @default(false)
+  mediaUrl    String?
+  mediaType   String?
+  mediaSource MediaSource?
+  question    Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Attempt {
+  id           String   @id @default(cuid())
+  userId       String
+  questionId   String
+  triesUsed    Int      @default(0)
+  solved       Boolean  @default(false)
+  pointsEarned Int      @default(0)
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question     Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+}
+
+model UserStats {
+  userId      String    @id
+  totalPoints Int       @default(0)
+  level       Int       @default(1)
+  streakDays  Int       @default(0)
+  lastPlayed  DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        String
+  description String
+  emoji       String      @default("🏅")
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+}

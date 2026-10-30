@@ -1,0 +1,31 @@
+# deps
+node_modules/
+
+# next
+.next/
+out/
+build/
+
+# env
+.env
+.env*.local
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+
+# prisma
+generated/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# vercel
+.vercel
+
+# uploads locais
+public/uploads/
