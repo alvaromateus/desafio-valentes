@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { MediaView } from '@/components/quiz/media-view';
 
 interface Props {
   prefix: string;
@@ -101,6 +102,14 @@ export function MediaFields({ prefix, mediaUrl, mediaType, mediaSource, onChange
               <span className="text-xs text-muted-foreground">
                 {mediaType === 'video' ? 'Video ate 25MB' : 'Imagem ate 5MB'}
               </span>
+            </div>
+          )}
+          {mediaUrl && (
+            <div className="mt-1">
+              <span className="mb-1 block text-xs text-muted-foreground">Pre-visualizacao:</span>
+              <div className="max-w-xs">
+                <MediaView mediaUrl={mediaUrl} mediaType={mediaType} mediaSource={mediaSource} />
+              </div>
             </div>
           )}
         </>

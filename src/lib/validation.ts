@@ -13,9 +13,15 @@ export function youTubeEmbedUrl(url: string): string | null {
   return id ? `https://www.youtube.com/embed/${id}` : null;
 }
 
+const URL_RE = new RegExp('^https?://');
+const mediaUrlSchema = z
+  .string()
+  .refine((v) => v === '' || URL_RE.test(v) || v.startsWith('/'), { message: 'URL invalida' })
+  .optional();
+
 export const mediaSchema = z
   .object({
-    mediaUrl: z.string().url().optional().or(z.literal("")),
+    mediaUrl: mediaUrlSchema,
     mediaType: z.enum(["image", "video"]).optional(),
     mediaSource: z.enum(["UPLOAD", "YOUTUBE"]).optional(),
   })
@@ -25,14 +31,14 @@ export const optionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, "Texto da alternativa obrigatório"),
   isCorrect: z.boolean(),
-  mediaUrl: z.string().url().optional().or(z.literal("")),
+  mediaUrl: mediaUrlSchema,
   mediaType: z.enum(["image", "video"]).optional(),
   mediaSource: z.enum(["UPLOAD", "YOUTUBE"]).optional(),
 });
 
 export const questionSchema = z.object({
   text: z.string().min(1, "Enunciado obrigatório"),
-  mediaUrl: z.string().url().optional().or(z.literal("")),
+  mediaUrl: mediaUrlSchema,
   mediaType: z.enum(["image", "video"]).optional(),
   mediaSource: z.enum(["UPLOAD", "YOUTUBE"]).optional(),
   options: z

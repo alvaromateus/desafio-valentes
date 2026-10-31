@@ -1,31 +1,50 @@
-# deps
+# Dependencias
 node_modules/
+.pnp
+.pnp.js
 
-# next
+# Build / Next.js
 .next/
 out/
 build/
+dist/
+next-env.d.ts
+*.tsbuildinfo
 
-# env
+# Variaveis de ambiente
 .env
 .env*.local
+.env.production
 
-# misc
+# Logs
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
 .DS_Store
+Thumbs.db
+*.swp
 *.pem
 
-# debug
-npm-debug.log*
-
-# prisma
+# Prisma
+prisma/generated/
 generated/
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Testes / cobertura
+coverage/
 
-# vercel
-.vercel
+# Vercel
+.vercel/
 
-# uploads locais
-public/uploads/
+# Uploads locais (midia enviada em dev)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Misc
+*.log
