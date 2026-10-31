@@ -28,7 +28,7 @@ export default async function QuizPage({ params }: { params: Promise<{ groupId: 
       mediaUrl: q.mediaUrl,
       mediaType: q.mediaType,
       mediaSource: q.mediaSource,
-      options: q.options,
+      options: shuffle(q.options),
       triesUsed: a?.triesUsed ?? 0,
       solved: a?.solved ?? false,
       finished: a ? (a.solved || a.triesUsed >= 3) : false,
@@ -36,6 +36,15 @@ export default async function QuizPage({ params }: { params: Promise<{ groupId: 
   });
 
   return (
-    <QuizPlayer groupId={groupId} groupName={data.group.name} questions={payload} />
+    <QuizPlayer groupId={groupId} groupName={data.group.name} questions={shuffle(payload)} />
   );
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
 }
