@@ -92,3 +92,26 @@ export async function removeAdminAction(groupId: string, memberUserId: string): 
     return { error: 'Nao foi possivel remover a administracao' };
   }
 }
+
+export async function resetMemberScoreAction(groupId: string, memberUserId: string): Promise<AdminState> {
+  try {
+    const user = await requireUser();
+    await assertCanManage(groupId, user.id);
+
+    await prisma.$transaction([
+      prisma.groupMember.updateMany({
+        where: { groupId, userId: memberUserId },
+        data: { score: 0 },
+      }),
+      prisma.attempt.deleteMany({
+        where: { userId: memberUserId, question: { groupId } },
+      }),
+    ]);
+
+    revalidatePath(`/admin/groups/${groupId}/members`);
+    revalidatePath(`/groups/${groupId}`);
+    return { success: 'ok' };
+  } catch {
+    return { error: 'Nao foi possivel zerar a pontuacao' };
+  }
+}

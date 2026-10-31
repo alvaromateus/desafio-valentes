@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { UserMinus } from 'lucide-react';
+import { UserMinus, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { removeMemberAction } from '@/actions/admin';
+import { removeMemberAction, resetMemberScoreAction } from '@/actions/admin';
 
 export function RemoveMemberButton({ groupId, userId, username }: { groupId: string; userId: string; username: string }) {
   const router = useRouter();
@@ -42,5 +42,26 @@ export function RemoveMemberButton({ groupId, userId, username }: { groupId: str
         </div>
       )}
     </>
+  );
+}
+
+export function ResetScoreButton({ groupId, userId, username }: { groupId: string; userId: string; username: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
+  async function go() {
+    if (!confirm(`Zerar a pontuacao de ${username}? Isso apaga o progresso dele neste grupo.`)) return;
+    setBusy(true);
+    const res = await resetMemberScoreAction(groupId, userId);
+    setBusy(false);
+    if (res.error) { toast.error(res.error); return; }
+    toast.success(`Pontuacao de ${username} zerada`);
+    router.refresh();
+  }
+
+  return (
+    <Button variant="ghost" size="sm" onClick={go} disabled={busy} title="Zerar pontuacao">
+      <RotateCcw className="h-4 w-4 text-neon-amber" />
+    </Button>
   );
 }

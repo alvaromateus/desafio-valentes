@@ -48,3 +48,5 @@ public/uploads/*
 
 # Misc
 *.log
+.vercel
+.env*

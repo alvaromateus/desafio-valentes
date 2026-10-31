@@ -4,7 +4,7 @@ import { getGroupForUser } from '@/actions/groups';
 import { prisma } from '@/lib/db';
 import { Avatar } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { RemoveMemberButton } from '@/components/admin/member-actions';
+import { RemoveMemberButton, ResetScoreButton } from '@/components/admin/member-actions';
 import { Phone } from 'lucide-react';
 
 export default async function MembersPage({ params }: { params: Promise<{ groupId: string }> }) {
@@ -32,7 +32,10 @@ export default async function MembersPage({ params }: { params: Promise<{ groupI
             </div>
             <span className="shrink-0 font-display text-sm font-bold text-gradient sm:text-base">{m.score} pts</span>
             {m.user.id !== data.group.adminId && (
-              <RemoveMemberButton groupId={groupId} userId={m.user.id} username={m.user.username} />
+              <>
+                <ResetScoreButton groupId={groupId} userId={m.user.id} username={m.user.username} />
+                <RemoveMemberButton groupId={groupId} userId={m.user.id} username={m.user.username} />
+              </>
             )}
           </CardContent>
         </Card>
